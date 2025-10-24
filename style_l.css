@@ -1,0 +1,153 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #ffa500; /* 全体の背景色はオレンジを維持 */
+}
+
+/* --- 背景要素のスタイル（元のindex.htmlのスタイルに合わせる） --- */
+
+.background-a {
+    height: 620px;
+    padding: 20px;
+    background-color: #ffa500;
+}
+
+.background-b {
+    color: #fff;
+    height: 25px;
+    width: 330px;
+    font-size: 14px;
+    background-color: #ffd700;
+    padding: 20px;
+    position: relative;
+    border-radius: 10px;
+    top: 0px;
+    /* 元のCSSに合わせて再調整 */
+    margin-left: -9px; 
+}
+
+.background-c {
+    color: #fff;
+    height: 470px;
+    width: 330px;
+    font-size: 14px;
+    background-color: #ffd700;
+    padding: 20px;
+    position: relative;
+    border-radius: 10px;
+    top: 0px;
+    /* 元のCSS（index.htmlのCSS）に合わせる */
+    margin-left: -20px; 
+    margin-top: 45px;
+}
+
+/* --- ナビゲーション（元のCSSをそのまま使用） --- */
+.main-nav {
+    display: flex;
+    justify-content: center;
+}
+.main-nav ul {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.main-nav li {
+    margin: 0 5px;
+}
+.main-nav a {
+    display: block;
+    padding: 5px 5px;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    font-size: 15px;
+    background-color: #fff;
+    border-radius: 10px;
+    transition: background-color 0.3s;
+    white-space: nowrap;
+}
+
+/* --- フォームとボタンのスタイル --- */
+
+.form-container {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    
+    /* 💡 ここを追加・修正: 黒い枠線（太さ1px、実線） */
+    border: 1px solid black; 
+    
+    /* background-cのパディングを考慮して調整 */
+    margin: 10px auto 20px auto; /* 左右マージンを auto にして中央寄せ（幅が固定の場合） */
+    width: 90%; /* 幅を親要素の90%に設定（中くらいのサイズに見せるため） */
+    max-width: 300px; /* 最大幅を設定し、あまり大きくならないようにする */
+}
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #333; /* 文字色を黒にする */
+    
+}
+
+input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* 記録ボタン（submit）のスタイル */
+input[type="submit"] {
+    background-color: orange; /* 👈 指示通りピンクに変更 */
+    color: black; /* 👈 指示通り黒に変更 */
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    transition: background-color 0.3s;
+    font-weight: bold; 
+}
+
+input[type="submit"]:hover {
+    /* ホバー時の色をピンクから少し濃い色に変更 */
+    background-color: orangered; 
+}
+
+/* メッセージ表示エリアのスタイル */
+#message {
+    margin-top: 15px;
+    font-weight: bold;
+    color: orange;
+}
+
+/* 目標設定ボタンのスタイル（white-button1）*/
+.white-button1 {
+    display: inline-block;
+    padding: 15px 24px;
+    background-color: #ffffff;
+    color: #333333;
+    border: 1px solid #000000;
+    border-radius: 15px;
+    text-decoration: underline;
+    text-decoration-color: #000000;
+    font-weight: bold;
+    font-size: 18px;
+    transition: background-color 0.3s, color 0.3s;
+    /* 元のCSSに合わせて再調整 */
+    margin-left: 77px; 
+    margin-top: 15px; 
+}
+
+.white-button1:hover {
+    background-color: #f2f2f2;
+    color: #000000;
+    cursor: pointer;
+}
