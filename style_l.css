@@ -151,3 +151,52 @@ input[type="submit"]:hover {
     color: #000000;
     cursor: pointer;
 }
+/* style_l.css の最下部などに追加 */
+
+/* 目標設定ページ専用のスタイル */
+
+/* 入力欄の微調整 */
+.form-container input[type="date"],
+.form-container select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* メッセージの注意書き */
+.note {
+    font-size: 12px;
+    color: #666;
+    margin-top: -10px;
+    margin-bottom: 15px;
+    text-align: right;
+}
+
+/* 結果表示ボックスのスタイル */
+.result-box {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    border: 2px solid #333; /* 目立つように枠線を追加 */
+    margin: 20px auto 10px auto;
+    width: 90%; 
+    max-width: 300px;
+    color: #333;
+    line-height: 1.6;
+    text-align: center;
+}
+
+.result-box hr {
+    border-color: #ffd700; /* background-cの色に合わせる */
+    margin: 10px 0;
+}
+
+.calorie-required span {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: orangered;
+}
