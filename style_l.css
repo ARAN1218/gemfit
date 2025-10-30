@@ -5,41 +5,39 @@ body {
     background-color: #ffa500; /* 全体の背景色はオレンジを維持 */
 }
 
-/* --- 背景要素のスタイル（画面サイズに合わせて変更） --- */
+/* --- 背景要素のスタイル（画面サイズに合わせて変更、左寄せに戻す） --- */
 
 .background-a {
-    /* height: 620px; <--- 削除: 自動でコンテンツに合わせる */
-    padding: 20px 10px; /* 左右のパディングを少し減らす */
+    padding: 20px 10px; 
     background-color: #ffa500;
     min-height: 100vh; /* 画面全体をカバーするために最小高さを設定 */
 }
 
 .background-b {
     color: #fff;
-    /* height: 25px; <--- 削除 */
-    /* width: 330px; <--- 削除: 親要素幅に合わせる */
     font-size: 14px;
     background-color: #ffd700;
-    padding: 15px 10px; /* パディングを調整 */
+    padding: 15px 10px; 
     position: relative;
     border-radius: 10px;
     top: 0px;
-    margin: 0 auto; /* 中央寄せ */
-    max-width: 350px; /* 最大幅を設定 */
+    /* ⭐ 修正: 左寄せに戻す ⭐ */
+    margin-left: -9px; 
+    max-width: 350px; 
 }
 
 .background-c {
     color: #fff;
-    /* height: 470px; <--- 削除: 自動でコンテンツに合わせる */
-    /* width: 330px; <--- 削除: 親要素幅に合わせる */
     font-size: 14px;
     background-color: #ffd700;
     padding: 20px;
     position: relative;
     border-radius: 10px;
     top: 0px;
-    margin: 15px auto 0 auto; /* 中央寄せとマージン調整 */
-    max-width: 350px; /* 最大幅を設定 */
+    /* ⭐ 修正: 左寄せに戻す ⭐ */
+    margin-left: -20px; 
+    margin-top: 45px; 
+    max-width: 350px; 
 }
 
 /* --- ナビゲーション（元のCSSをそのまま使用、中央寄せは維持） --- */
@@ -77,9 +75,10 @@ body {
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     border: 1px solid black; 
+    /* ⭐ 中央寄せは維持 (フォームは黄色い枠の中で中央寄せが一般的) ⭐ */
     margin: 10px auto 20px auto; 
     width: 90%; 
-    max-width: 300px; /* 最大幅を維持 */
+    max-width: 300px; 
 }
 label {
     display: block;
@@ -89,7 +88,7 @@ label {
 }
 
 input[type="number"],
-.form-container select { /* selectも追加して幅を揃える */
+.form-container select { 
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
@@ -123,9 +122,9 @@ input[type="submit"]:hover {
     color: orange;
 }
 
-/* 目標設定ボタンのスタイル（white-button1） - 目標ページには不要かもしれませんが、定義は維持 */
+/* 目標設定ボタンのスタイル（white-button1） */
 .white-button1 {
-    display: inline-block;
+    display: block; 
     padding: 15px 24px;
     background-color: #ffffff;
     color: #333333;
@@ -136,8 +135,8 @@ input[type="submit"]:hover {
     font-weight: bold;
     font-size: 18px;
     transition: background-color 0.3s, color 0.3s;
-    margin: 15px auto; /* 中央寄せに変更 */
-    display: block; /* ブロック要素にして中央寄せを有効化 */
+    /* ⭐ 中央寄せを維持 ⭐ */
+    margin: 15px auto; 
     width: fit-content;
 }
 
@@ -146,13 +145,11 @@ input[type="submit"]:hover {
     color: #000000;
     cursor: pointer;
 }
-/* style_l.css の最下部などに追加 */
 
 /* 目標設定ページ専用のスタイル */
 
 /* 入力欄の微調整 */
 .form-container input[type="date"] {
-    /* selectは上で修正済み */
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
@@ -177,6 +174,7 @@ input[type="submit"]:hover {
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     border: 2px solid #333; 
+    /* ⭐ 中央寄せを維持 ⭐ */
     margin: 20px auto 10px auto;
     width: 90%; 
     max-width: 300px;
