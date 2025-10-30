@@ -33,7 +33,8 @@ async function getGasUrl() {
 
 // ローカルストレージ または GASから最新の体重を取得し、初期値として設定
 async function setInitialWeight() {
-    await getGasUrl(); // GAS_URLを非同期で取得
+    // getGasUrlを await することで、GAS_URLが確実にセットされるのを待つ
+    await getGasUrl(); 
 
     let latestWeight = null;
     let records = JSON.parse(localStorage.getItem('weightRecords')) || [];
@@ -43,7 +44,7 @@ async function setInitialWeight() {
         try {
             // GASのdoGetに 'action=getLatest' を付けてリクエスト
             const response = await fetch(`${GAS_URL}?action=getLatest`);
-            // response.json()の前にresponse.okチェックを入れるとより安全
+            
             if (response.ok) {
                 const gasData = await response.json();
                 if (gasData && gasData.latestWeight) {
@@ -51,7 +52,7 @@ async function setInitialWeight() {
                     console.log("GASから最新体重を取得:", latestWeight);
                 }
             } else {
-                 console.error("GASからの体重取得エラー: ステータス", response.status);
+                console.error("GASからの体重取得エラー: ステータス", response.status);
             }
         } catch (error) {
             console.error("GASからの体重取得に失敗しました:", error);
@@ -67,6 +68,7 @@ async function setInitialWeight() {
 
     // 3. 初期値を設定
     if (latestWeight !== null) {
+        // ⭐ 最新体重を current_weight 入力欄にセット
         currentWeightInput.value = latestWeight.toFixed(1);
     } else {
         // データがない場合はHTMLのデフォルト値を使用
@@ -234,5 +236,8 @@ form.addEventListener('submit', function(event) {
 });
 
 
-// ページロード時に実行
-setInitialWeight();
+// ⭐⭐⭐ 修正箇所: スクリプト全体を非同期関数でラップし、await setInitialWeight() を実行 ⭐⭐⭐
+(async () => {
+    // ページロード時に setInitialWeight を呼び出し、GASからの最新体重取得が完了するのを待ちます
+    await setInitialWeight(); 
+})();
