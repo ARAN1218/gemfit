@@ -1,5 +1,5 @@
 // script_l.js
-// スクリプト全体をasync IIFE（即時実行関数式）でラップし、awaitを使用可能にする
+
 (async () => {
     // Vercelのサーバーレス関数(/api/secret)を呼び出す
     let GAS_URL = '';
@@ -9,11 +9,9 @@
             throw new Error(`サーバーエラー: ${response.status}`);
         }
         const data = await response.json();
-        // Vercelで設定された環境変数 (MY_SECRET_MESSAGE) の値 (GAS URL) が格納される
         GAS_URL = data.message; 
     } catch (error) {
         console.error("GAS_URLの取得に失敗しました:", error);
-        // エラー発生時は、メッセージを表示して続行を停止
         document.getElementById('message').textContent = '❌ サーバー連携エラー。F12でコンソールを確認してください。';
         return; 
     }
@@ -27,34 +25,21 @@
     let weightChart = null; 
 
 
-    // グラフ描画関数 (GASから取得したデータを使用)
+    // グラフ描画関数 (簡略化)
     function renderChart(weightRecords) {
-        
-        if (!chartCanvas) {
-            console.error("Error: 'weightChart' canvas element not found.");
-            return;
-        }
-
-        // データがなければグラフを非表示にして終了
+        if (!chartCanvas) { return; }
         if (!weightRecords || weightRecords.length === 0) {
-            if (weightChart) {
-                weightChart.destroy();
-                weightChart = null;
-            }
+            if (weightChart) { weightChart.destroy(); weightChart = null; }
             return;
         }
         
-        // 最新の7件のレコードのみを抽出してグラフデータを作成 (ソート済みの前提)
         const last7Records = weightRecords.slice(-7);
-
         const labels = last7Records.map(record => record.date); 
         const data = last7Records.map(record => parseFloat(record.weight));
 
-        if (weightChart) {
-            weightChart.destroy();
-        }
+        if (weightChart) { weightChart.destroy(); }
 
-        // Chart.jsでグラフを作成
+        // Chart.jsでグラフを作成 (詳細は省略)
         weightChart = new Chart(chartCanvas, {
             type: 'line',
             data: {
@@ -70,100 +55,51 @@
                     spanGaps: true
                 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false, 
-                scales: {
-                    x: {
-                        display: true,
-                        title: { display: true, text: '日付' },
-                        ticks: {
-                            font: { size: 10 },
-                            autoSkip: false, 
-                            maxRotation: 0, 
-                            minRotation: 0,
-                            padding: 5 
-                        }
-                    },
-                    y: {
-                        beginAtZero: false,
-                        title: { display: true, text: '体重 (kg)' }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        onClick: () => { return; },
-                    }
-                }
-            }
+            options: { responsive: true, maintainAspectRatio: false }
         });
     }
 
     /**
-     * GASから体重履歴を取得し、renderChartを呼び出す（メインのデータローダー）
+     * GASから体重履歴を取得し、renderChartを呼び出す
      */
     async function loadAndRenderChart() {
-        if (!GAS_URL) {
-            console.warn("GAS URLが未設定です。グラフを描画できません。");
-            renderChart([]);
-            return;
-        }
+        if (!GAS_URL) { return; }
 
         try {
             messageElement.textContent = 'グラフデータを読み込み中...';
             messageElement.style.color = 'gray';
 
+            // GETリクエストで履歴を取得
             const response = await fetch(`${GAS_URL}?action=getHistory`);
             
-            if (!response.ok) {
-                throw new Error(`GAS履歴取得エラー: ${response.status} (CORS/GAS設定を確認)`);
-            }
-            // JSONとしてレスポンスをパース
+            if (!response.ok) { throw new Error(`GAS履歴取得エラー: ${response.status}`); }
+            
             const data = await response.json(); 
 
             if (data.status === 'success' && data.data) {
-                
-                // GASからのデータをグラフ描画用の形式に変換し、日付順にソート
+                // ... データ処理と重複排除ロジック ...
                 const formattedRecords = data.data
                     .map(item => {
                         let dateKey = String(item.date); 
                         const dateObject = new Date(dateKey);
-
-                        let dateLabel = '';
+                        let dateLabel = !isNaN(dateObject.getTime()) ? String(dateObject.getDate()) : '無効';
                         if (!isNaN(dateObject.getTime())) { 
                             dateKey = `${dateObject.getFullYear()}/${dateObject.getMonth() + 1}/${dateObject.getDate()}`;
-                            // グラフのX軸ラベルは日付のみを表示
-                            dateLabel = String(dateObject.getDate()); 
                         } else {
-                            dateLabel = '無効';
                             dateKey = '1970/1/1'; 
                         }
-                        
-                        return {
-                            date: dateLabel, 
-                            key: dateKey, 
-                            weight: item.weight
-                        };
+                        return { date: dateLabel, key: dateKey, weight: item.weight };
                     })
-                    // 日付（key）でソート
                     .sort((a, b) => new Date(a.key) - new Date(b.key)); 
 
-                
-                // 重複排除のロジック（同じ日付キーは最新のものだけを残す）
                 const uniqueRecords = {};
-                formattedRecords.forEach(record => {
-                    uniqueRecords[record.key] = record;
-                });
-
+                formattedRecords.forEach(record => { uniqueRecords[record.key] = record; });
                 const cleanRecords = Object.values(uniqueRecords);
 
                 renderChart(cleanRecords); 
                 messageElement.textContent = ''; 
                 
             } else {
-                console.warn("GASから体重履歴が取得できませんでした:", data.message);
                 renderChart([]);
                 messageElement.textContent = 'データがありません。体重を入力してください。';
                 messageElement.style.color = 'black';
@@ -178,7 +114,7 @@
     }
 
 
-    // 2. フォーム送信時のイベント処理（GASへの送信とグラフ更新）
+    // 2. フォーム送信時のイベント処理
     if (form) {
         form.addEventListener('submit', function(event) {
             event.preventDefault();
@@ -191,33 +127,24 @@
 
             const enteredWeight = weightInput.value;
             const weightValue = parseFloat(enteredWeight);
-
             const now = new Date();
             const dateKey = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
 
-            // ⭐ 記録データはクエリパラメータとして直接GAS URLに付加する ⭐
+            // ⭐ GETリクエストで記録データ送信 ⭐
             const recordUrl = `${GAS_URL}?action=recordWeight&date=${dateKey}&weight=${weightValue.toFixed(1)}`;
 
-            // ----------------------------------------------------
-            // 💡 GASへのデータ送信処理 (POSTからGETに変更)
-            // ----------------------------------------------------
             if (GAS_URL) {
                 messageElement.textContent = '記録を送信中...';
                 messageElement.style.color = 'blue';
                 
-                // GETリクエストでデータを送信（POSTエラーを回避）
                 fetch(recordUrl)
                     .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`GASエラー: ${response.status}`);
-                        }
+                        if (!response.ok) { throw new Error(`GASエラー: ${response.status}`); }
                         return response.json();
                     })
                     .then(data => {
                         if (data.status === 'success') {
-                            // 成功したら、GASから全データを再取得してグラフを更新する
                             loadAndRenderChart(); 
-
                             messageElement.textContent = '✅ 体重を記録しました！グラフを更新します。';
                             messageElement.style.color = 'orange';
                         } else {
@@ -234,11 +161,10 @@
                     messageElement.style.color = 'red';
             }
 
-            // フォームをリセット
             form.reset();
         });
     }
 
-    // ⭐ ページ読み込み時の実行: GASからデータを取得し、グラフを描画する
+    // ⭐ ページ読み込み時の実行
     await loadAndRenderChart();
 })();
