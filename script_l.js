@@ -78,15 +78,15 @@
                             display: true,
                             text: '日付'
                         },
-                        // ⭐⭐ 横軸の文字重なり解消と全日付表示の修正 ⭐⭐
+                        // ⭐⭐ 横軸の文字重なり解消と全日付表示の設定 ⭐⭐
                         ticks: {
                             font: {
                                 size: 10 // フォントサイズを小さく維持
                             },
-                            autoSkip: false, // ⭐ 全ラベル表示を強制 ⭐
+                            autoSkip: false, // 全ラベル表示を強制
                             maxRotation: 0, 
                             minRotation: 0,
-                            padding: 5 // ⭐ ラベル間の余白を増やす ⭐
+                            padding: 5 // ラベル間の余白を増やす
                         }
                     },
                     y: {
@@ -135,14 +135,24 @@
                 // GASからのデータをグラフ描画用の形式に変換し、日付順にソート
                 const formattedRecords = data.data
                     .map(item => {
-                        let dateKey = String(item.date); // 例: '2025/10/30'
-                        let dateLabel = dateKey;
+                        let dateKey = String(item.date); // 例: '2025/10/30' または複雑な形式
 
-                        // YYYY/M/D形式ならD形式に変換 (横軸ラベル用)
-                        if (dateKey.includes('/') && dateKey.split('/').length === 3) {
-                            // ⭐ 日付の「日」部分のみを取得し、ラベルとする ⭐
-                            dateLabel = dateKey.split('/').pop(); // '2025/10/30' -> '30'
+                        // ⭐⭐ 修正：Dateオブジェクトを介して確実な日付処理を行う ⭐⭐
+                        const dateObject = new Date(dateKey);
+
+                        let dateLabel = '';
+                        // dateObject が有効な日付であれば
+                        if (!isNaN(dateObject.getTime())) { // .getTime()で確実なチェック
+                             // 'YYYY/M/D'形式のキーを再構築 (ソート用)
+                            dateKey = `${dateObject.getFullYear()}/${dateObject.getMonth() + 1}/${dateObject.getDate()}`;
+                            // '日' の部分のみをラベルとする
+                            dateLabel = String(dateObject.getDate()); // 例: '27'
+                        } else {
+                            // 日付が無効な場合は、元の値をそのままラベルとして使用
+                            dateLabel = '無効';
+                            dateKey = '1970/1/1'; // ソートで先頭に追いやる
                         }
+                        // -----------------------------------------------------
                         
                         return {
                             date: dateLabel,  // グラフの横軸ラベルに使う
