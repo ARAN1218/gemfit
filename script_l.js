@@ -25,7 +25,7 @@
 
 
     // グラフ描画関数 (GASから取得したデータを使用)
-    // weightRecords: { date: 'M/D', key: 'YYYY/M/D', weight: 60.5 } の配列
+    // weightRecords: { date: 'D', key: 'YYYY/M/D', weight: 60.5 } の配列
     function renderChart(weightRecords) {
         
         if (!chartCanvas) {
@@ -45,7 +45,7 @@
         // 最新の7件のレコードのみを抽出してグラフデータを作成 (ソート済みの前提)
         const last7Records = weightRecords.slice(-7);
 
-        const labels = last7Records.map(record => record.date); // '10/20' 形式
+        const labels = last7Records.map(record => record.date); // '27' 形式
         const data = last7Records.map(record => parseFloat(record.weight));
 
         if (weightChart) {
@@ -70,7 +70,7 @@
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false, // ⭐ グラフが縮小するのを防ぐために false に変更 ⭐
+                maintainAspectRatio: false, // グラフのサイズは親要素のCSSで制御される
                 scales: {
                     x: {
                         display: true,
@@ -78,12 +78,12 @@
                             display: true,
                             text: '日付'
                         },
-                        // ⭐⭐ 横軸のフォントサイズと回転を調整する修正 ⭐⭐
+                        // ⭐⭐ 横軸の文字重なり解消とフォント調整の修正 ⭐⭐
                         ticks: {
                             font: {
-                                size: 10 // フォントサイズを小さくする
+                                size: 10 // フォントサイズを小さく維持
                             },
-                            autoSkip: false, 
+                            autoSkip: true, // 重なり防止のために自動スキップを有効にする
                             maxRotation: 0, 
                             minRotation: 0 
                         }
@@ -137,9 +137,10 @@
                         let dateKey = String(item.date); // 例: '2025/10/30'
                         let dateLabel = dateKey;
 
-                        // YYYY/M/D形式ならM/D形式に変換 (横軸ラベル用)
+                        // YYYY/M/D形式ならD形式に変換 (横軸ラベル用)
                         if (dateKey.includes('/') && dateKey.split('/').length === 3) {
-                            dateLabel = dateKey.split('/').slice(1).join('/'); // 例: '10/30'
+                            // ⭐⭐ 修正：日付の「日」部分のみを取得し、ラベルとする ⭐⭐
+                            dateLabel = dateKey.split('/').pop(); // '2025/10/30' -> '30'
                         }
                         
                         return {
