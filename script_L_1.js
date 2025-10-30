@@ -5,7 +5,7 @@ const form = document.getElementById('goal-form');
 const currentWeightInput = document.getElementById('current_weight');
 const targetWeightInput = document.getElementById('target_weight');
 
-// ⭐ 変更: 目標期間（月数）の入力欄を取得
+// ⭐ 目標期間（月数）の入力欄を取得
 const targetPeriodInput = document.getElementById('target_period_months');
 
 // ⭐ 追加した要素の取得
@@ -43,12 +43,15 @@ async function setInitialWeight() {
         try {
             // GASのdoGetに 'action=getLatest' を付けてリクエスト
             const response = await fetch(`${GAS_URL}?action=getLatest`);
-            const gasData = await response.json();
-
-            if (gasData && gasData.latestWeight) {
-                // GASから取得した値をセット
-                latestWeight = parseFloat(gasData.latestWeight);
-                console.log("GASから最新体重を取得:", latestWeight);
+            // response.json()の前にresponse.okチェックを入れるとより安全
+            if (response.ok) {
+                const gasData = await response.json();
+                if (gasData && gasData.latestWeight) {
+                    latestWeight = parseFloat(gasData.latestWeight);
+                    console.log("GASから最新体重を取得:", latestWeight);
+                }
+            } else {
+                 console.error("GASからの体重取得エラー: ステータス", response.status);
             }
         } catch (error) {
             console.error("GASからの体重取得に失敗しました:", error);
@@ -147,8 +150,8 @@ form.addEventListener('submit', function(event) {
     // ----------------------------------------------------
     // ⭐ 日数の計算ロジックを修正
     // ----------------------------------------------------
-    if (targetPeriodMonths <= 0) {
-        messageElement.textContent = '❌ 目標期間は1ヶ月以上に設定してください。';
+    if (targetPeriodMonths <= 0 || isNaN(targetPeriodMonths)) {
+        messageElement.textContent = '❌ 目標期間は1ヶ月以上の有効な値に設定してください。';
         messageElement.style.color = 'red';
         resultArea.style.display = 'none';
         return;
@@ -193,6 +196,35 @@ form.addEventListener('submit', function(event) {
             dailyTDEE: result.tdee,
             activityLevel: activityLevel,
         }));
+
+        // ⭐ 6. GASへ推奨摂取カロリーを送信 (C列に記録するため)
+        if (GAS_URL) {
+            const today = new Date();
+            // A列に記録するための日付キー（例: 2025/10/20）
+            const dateKey = `${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}`;
+            
+            const goalPostData = {
+                type: 'goal', // 👈 GASでカロリーデータであることを識別するためのキー
+                date: dateKey,
+                intakeCalorie: result.intake // 👈 推奨摂取カロリー
+            };
+
+            fetch(GAS_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(goalPostData) 
+            })
+            .then(() => {
+                // no-corsモードではレスポンス内容を確認できないため、成功と見なす
+                console.log('推奨摂取カロリーをGASに送信しました。');
+            })
+            .catch(error => {
+                console.error('カロリーのGAS送信エラー:', error);
+            });
+        }
 
     } else {
         messageElement.textContent = '❌ 計算エラーが発生しました。入力値を確認してください。';
