@@ -46,15 +46,7 @@
 
                     <label for="age">年齢</label>
                     <input type="number" id="age" name="age" min="1" max="150" required>
-                    <label for="activity_level">活動レベル</label>
-                    <select id="activity_level" name="activity_level" required>
-                        <option value="1.2">ほぼ運動しない</option>
-                        <option value="1.375">軽い運動（週1～3回）</option>
-                        <option value="1.55" selected>中程度の運動（週3～5回）</option>
-                        <option value="1.725">激しい運動（週6～7回）</option>
-                        <option value="1.9">非常に激しい運動（1日2回など）</option>
-                    </select>
-
+                    
                     <input type="submit" value="目標とカロリーを計算する">
                 </form>
             </div>
@@ -64,7 +56,7 @@
                 <p>目標達成までの期間: <span id="days-remaining"></span> 日</p>
                 <p>減量目標: <span id="weight-loss"></span> kg</p>
                 <hr>
-                <p class="calorie-required">推奨 1日消費カロリー (TDEE): <span id="tdee"></span> kcal</p>
+                <p class="calorie-required">推奨 1日基礎代謝 (BMR): <span id="tdee"></span> kcal</p>
                 <p class="calorie-required">推奨 1日摂取カロリー: <span id="intake-calorie"></span> kcal</p>
             </div>
             

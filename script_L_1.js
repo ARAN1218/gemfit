@@ -8,11 +8,10 @@ const targetWeightInput = document.getElementById('target_weight');
 // ⭐ 目標期間（月数）の入力欄を取得
 const targetPeriodInput = document.getElementById('target_period_months');
 
-// ⭐ 追加した要素の取得
+// ⭐ 必要な要素のみを取得（活動レベルは削除）
 const genderSelect = document.getElementById('gender'); 
 const heightInput = document.getElementById('height');
 const ageInput = document.getElementById('age'); 
-const activityLevelSelect = document.getElementById('activity_level');
 const resultArea = document.getElementById('result-area');
 const messageElement = document.getElementById('goal-message');
 
@@ -94,15 +93,16 @@ function calculateBMR(gender, weight, height, age) {
     return Math.round(bmr);
 }
 
-function calculateTargetCalories(currentWeight, targetWeight, days, activityLevel, gender, height, age) {
+// ⭐ TDEEを考慮しないシンプルな目標カロリー計算に修正
+function calculateTargetCalories(currentWeight, targetWeight, days, gender, height, age) { 
     const weightToLose = currentWeight - targetWeight;
     if (weightToLose <= 0) {
         return null; 
     }
     
-    // 1. 基礎代謝 (BMR) と総消費カロリー (TDEE) を計算
+    // 1. 基礎代謝 (BMR) を計算
     const bmr = calculateBMR(gender, currentWeight, height, age); 
-    const tdee = Math.round(bmr * activityLevel);
+    const tdee = bmr; // TDEEの項目にはBMRを表示するため、TDEE = BMRと定義
 
     // 2. 目標達成に必要な総カロリー赤字 (合計)
     const totalCalorieDeficit = weightToLose * KCAL_PER_KG;
@@ -110,24 +110,24 @@ function calculateTargetCalories(currentWeight, targetWeight, days, activityLeve
     // 3. 1日あたりの平均カロリー赤字
     const dailyCalorieDeficit = totalCalorieDeficit / days;
     
-    // 4. 推奨 1日摂取カロリー
-    const recommendedIntake = Math.round(tdee - dailyCalorieDeficit);
+    // 4. 推奨 1日摂取カロリー (BMR - 赤字)
+    const recommendedIntake = Math.round(bmr - dailyCalorieDeficit);
 
     // ⚠ 安全性チェック: 極端なカロリー制限を防ぐ
-    const MIN_INTAKE = gender === 'male' ? 1500 : 1200; // 性別で最低カロリーを分ける
+    const MIN_INTAKE = gender === 'male' ? 1500 : 1200; 
     if (recommendedIntake < MIN_INTAKE) {
         messageElement.textContent = `⚠ 安全のため、1日の摂取カロリーは最低 ${MIN_INTAKE} kcalに設定されました。期間を見直しましょう。`;
         messageElement.style.color = 'red';
         
         return {
-            tdee: tdee,
+            tdee: tdee, // BMRを表示
             intake: MIN_INTAKE,
             weightLoss: weightToLose.toFixed(1)
         };
     }
 
     return {
-        tdee: tdee,
+        tdee: tdee, // BMRを表示
         intake: recommendedIntake,
         weightLoss: weightToLose.toFixed(1)
     };
@@ -147,10 +147,10 @@ form.addEventListener('submit', function(event) {
     const gender = genderSelect.value;
     const height = parseFloat(heightInput.value);
     const age = parseInt(ageInput.value, 10);
-    const activityLevel = parseFloat(activityLevelSelect.value);
+    // 活動レベルは使用しない
 
     // ----------------------------------------------------
-    // ⭐ 日数の計算ロジックを修正
+    // ⭐ 日数の計算ロジック
     // ----------------------------------------------------
     if (targetPeriodMonths <= 0 || isNaN(targetPeriodMonths)) {
         messageElement.textContent = '❌ 目標期間は1ヶ月以上の有効な値に設定してください。';
@@ -170,8 +170,8 @@ form.addEventListener('submit', function(event) {
         return;
     }
 
-    // カロリー計算
-    const result = calculateTargetCalories(currentWeight, targetWeight, days, activityLevel, gender, height, age);
+    // カロリー計算 
+    const result = calculateTargetCalories(currentWeight, targetWeight, days, gender, height, age);
 
     if (result) {
         // 4. 結果表示
@@ -182,7 +182,7 @@ form.addEventListener('submit', function(event) {
         
         resultArea.style.display = 'block';
         
-        // ⭐ 結果メッセージを期間に合わせて修正
+        // ⭐ 結果メッセージ
         messageElement.textContent = `✅ ${targetPeriodMonths}ヶ月で目標達成するためのカロリーが設定されました！`;
         messageElement.style.color = 'green';
         
@@ -190,25 +190,23 @@ form.addEventListener('submit', function(event) {
         localStorage.setItem('userGoal', JSON.stringify({
             currentWeight: currentWeight,
             targetWeight: targetWeight,
-            targetPeriodMonths: targetPeriodMonths, // ⭐ 目標期間を保存
+            targetPeriodMonths: targetPeriodMonths,
             gender: gender, 
             height: height, 
             age: age,
             dailyIntakeTarget: result.intake,
-            dailyTDEE: result.tdee,
-            activityLevel: activityLevel,
+            dailyTDEE: result.tdee, // 値はBMR
         }));
 
         // ⭐ 6. GASへ推奨摂取カロリーを送信 (C列に記録するため)
         if (GAS_URL) {
             const today = new Date();
-            // A列に記録するための日付キー（例: 2025/10/20）
             const dateKey = `${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}`;
             
             const goalPostData = {
-                type: 'goal', // 👈 GASでカロリーデータであることを識別するためのキー
+                type: 'goal', 
                 date: dateKey,
-                intakeCalorie: result.intake // 👈 推奨摂取カロリー
+                intakeCalorie: result.intake 
             };
 
             fetch(GAS_URL, {
@@ -220,7 +218,6 @@ form.addEventListener('submit', function(event) {
                 body: JSON.stringify(goalPostData) 
             })
             .then(() => {
-                // no-corsモードではレスポンス内容を確認できないため、成功と見なす
                 console.log('推奨摂取カロリーをGASに送信しました。');
             })
             .catch(error => {
@@ -236,8 +233,7 @@ form.addEventListener('submit', function(event) {
 });
 
 
-// ⭐⭐⭐ 修正箇所: スクリプト全体を非同期関数でラップし、await setInitialWeight() を実行 ⭐⭐⭐
+// ⭐⭐⭐ スクリプト全体を非同期関数でラップし、await setInitialWeight() を実行 ⭐⭐⭐
 (async () => {
-    // ページロード時に setInitialWeight を呼び出し、GASからの最新体重取得が完了するのを待ちます
     await setInitialWeight(); 
 })();
