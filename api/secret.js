@@ -1,59 +1,15 @@
-// api/search-calorie.js
+// api/secret.js
+// GASのウェブアプリURLをフロントエンドに渡すためのVercelサーバーレス関数
 
-import { GoogleGenAI } from "@google/genai";
-
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const ai = new GoogleGenAI(GEMINI_API_KEY);
-
-export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method Not Allowed' });
-    }
-
-    const { foodName } = req.body;
-
-    if (!foodName) {
-        return res.status(400).json({ error: '食事名が指定されていません。' });
-    }
-
-    try {
-        const prompt = `
-            ユーザーが入力した食事名: ${foodName}
-            
-            この食事の一般的なカロリー情報とPFC（タンパク質、脂質、炭水化物）を、
-            以下のJSON形式のみで回答してください。
-            回答にはJSON以外の余計なテキストを一切含めないでください。
-
-            {
-              "calories": (カロリー, kcal),
-              "protein": (タンパク質, g),
-              "fat": (脂質, g),
-              "carb": (炭水化物, g)
-            }
-        `;
-
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: prompt,
-        });
-
-        const text = response.text.trim();
-        
-        let calorieData;
-        try {
-            calorieData = JSON.parse(text);
-        } catch (e) {
-            console.error("AIが有効なJSONを返しませんでした:", text);
-            return res.status(500).json({ error: 'AIがカロリー情報を解析できませんでした。' });
-        }
-
-        res.status(200).json({ 
-            status: 'success', 
-            data: calorieData 
-        });
-
-    } catch (error) {
-        console.error('Gemini API 呼び出しエラー:', error);
-        res.status(500).json({ error: 'Gemini API の呼び出し中にエラーが発生しました。' });
+export default function handler(req, res) {
+    // ⭐ Vercelの環境変数名に合わせて修正しました ⭐
+    const gasUrl = process.env.MY_SECRET_MESSAGE; 
+    
+    if (gasUrl) {
+        // GASのURLが存在すれば、JSONとして返します。
+        res.status(200).json({ message: gasUrl });
+    } else {
+        // 環境変数が設定されていない場合、500エラーを返します。
+        res.status(500).json({ error: 'GAS URL environment variable (MY_SECRET_MESSAGE) not set' });
     }
 }
