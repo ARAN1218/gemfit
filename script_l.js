@@ -56,7 +56,7 @@
         weightChart = new Chart(chartCanvas, {
             type: 'line',
             data: {
-                labels: labels,
+                labels: labels, // ⭐ ここに 'M/D'形式のラベルが入る ⭐
                 datasets: [{
                     label: '体重 (kg)',
                     data: data,
@@ -72,6 +72,14 @@
                 responsive: true,
                 maintainAspectRatio: true,
                 scales: {
+                    x: { // ⭐ x軸設定の確認 ⭐
+                        // type: 'category' がデフォルトで、labelsを使います
+                        display: true, // 軸の表示を確実にする
+                        title: {
+                            display: true,
+                            text: '日付'
+                        }
+                    },
                     y: {
                         beginAtZero: false,
                         title: {
@@ -115,13 +123,23 @@
 
             if (data.status === 'success' && data.data) {
                 
-                // GASからのデータをグラフ描画用の形式に変換し、日付順にソート（GAS側でソートされていれば不要）
+                // GASからのデータをグラフ描画用の形式に変換し、日付順にソート
                 const formattedRecords = data.data
-                    .map(item => ({
-                        date: item.date.split('/').slice(1).join('/'), // M/D形式に変換 (例: 10/20)
-                        key: item.date,                                 // YYYY/M/D (キー用)
-                        weight: item.weight
-                    }))
+                    .map(item => {
+                        let dateKey = String(item.date); // 例: '2025/10/30'
+                        let dateLabel = dateKey;
+
+                        // YYYY/M/D形式ならM/D形式に変換 (横軸ラベル用)
+                        if (dateKey.includes('/') && dateKey.split('/').length === 3) {
+                            dateLabel = dateKey.split('/').slice(1).join('/'); // 例: '10/30'
+                        }
+                        
+                        return {
+                            date: dateLabel,  // グラフの横軸ラベルに使う ⭐
+                            key: dateKey,     // ソートや内部処理に使う
+                            weight: item.weight
+                        };
+                    })
                     // 日付（key）でソート
                     .sort((a, b) => new Date(a.key) - new Date(b.key)); 
 
@@ -145,12 +163,9 @@
 
 
     // 2. フォーム送信時のイベント処理（GASへの送信とグラフ更新）
-    // フォーム要素が存在することを確認
     if (form) {
         form.addEventListener('submit', function(event) {
             event.preventDefault();
-            
-            // エラーチェックはそのまま維持
 
             if (weightInput.value === "" || isNaN(parseFloat(weightInput.value))) {
                 messageElement.textContent = '❌ 有効な体重を入力してください。';
@@ -166,7 +181,7 @@
             const dateKey = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
 
             const postData = {
-                type: 'weight', // GAS側で体重記録と識別できるようにタイプを追加（もし必要であれば）
+                type: 'weight',
                 date: dateKey,
                 weight: weightValue.toFixed(1)
             };
@@ -180,7 +195,7 @@
 
                 fetch(GAS_URL, {
                         method: 'POST',
-                        mode: 'no-cors', // クロスドメイン通信の設定
+                        mode: 'no-cors',
                         headers: {
                             'Content-Type': 'application/json',
                         },
