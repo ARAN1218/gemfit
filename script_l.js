@@ -177,39 +177,39 @@
                         messageElement.style.color = 'red';
                     });
             } else {
-                 // GAS_URLがない場合のローカルストレージ更新とメッセージ表示の処理のみを行う
-                 let weightRecords = JSON.parse(localStorage.getItem('weightRecords')) || [];
+                     // GAS_URLがない場合のローカルストレージ更新とメッセージ表示の処理のみを行う
+                     let weightRecords = JSON.parse(localStorage.getItem('weightRecords')) || [];
 
-                 let isUpdated = false;
+                     let isUpdated = false;
 
-                 // 既存のレコードがあれば更新
-                 for (let i = 0; i < weightRecords.length; i++) {
-                     if (weightRecords[i].key === dateKey) {
-                         weightRecords[i].weight = postData.weight;
-                         isUpdated = true;
-                         break;
+                     // 既存のレコードがあれば更新
+                     for (let i = 0; i < weightRecords.length; i++) {
+                         if (weightRecords[i].key === dateKey) {
+                             weightRecords[i].weight = postData.weight;
+                             isUpdated = true;
+                             break;
+                         }
                      }
-                 }
 
-                 // なければ新規追加
-                 if (!isUpdated) {
-                     // date: グラフのラベル用 (10/20)、key: 内部処理用 (2025/10/20)
-                     weightRecords.push({
-                         date: `${now.getMonth() + 1}/${now.getDate()}`,
-                         key: dateKey,
-                         weight: postData.weight
-                     });
-                 }
+                     // なければ新規追加
+                     if (!isUpdated) {
+                         // date: グラフのラベル用 (10/20)、key: 内部処理用 (2025/10/20)
+                         weightRecords.push({
+                             date: `${now.getMonth() + 1}/${now.getDate()}`,
+                             key: dateKey,
+                             weight: postData.weight
+                         });
+                     }
 
-                 // 日付順にソートしてローカルストレージに保存
-                 weightRecords.sort((a, b) => new Date(a.key) - new Date(b.key));
-                 localStorage.setItem('weightRecords', JSON.stringify(weightRecords));
+                     // 日付順にソートしてローカルストレージに保存
+                     weightRecords.sort((a, b) => new Date(a.key) - new Date(b.key));
+                     localStorage.setItem('weightRecords', JSON.stringify(weightRecords));
 
-                 renderChart(); // グラフを更新
+                     renderChart(); // グラフを更新
 
-                 const message = isUpdated ? '✨ 体重を修正しました！（GASへは未送信）' : '✅ 体重を記録しました！（GASへは未送信）';
-                 messageElement.textContent = `${message} GAS_URLが未設定または取得失敗のため、データはローカルにのみ保存されました。`;
-                 messageElement.style.color = 'orange';
+                     const message = isUpdated ? '✨ 体重を修正しました！（GASへは未送信）' : '✅ 体重を記録しました！（GASへは未送信）';
+                     messageElement.textContent = `${message} GAS_URLが未設定または取得失敗のため、データはローカルにのみ保存されました。`;
+                     messageElement.style.color = 'orange';
             }
 
 
@@ -218,6 +218,7 @@
         });
     }
 
-    // ページが読み込まれたらすぐに実行
+    // ⭐ 修正追加箇所 ⭐
+    // スクリプトの実行（ページ読み込み時）に、過去のデータを元にグラフを描画する
     renderChart();
 })();
