@@ -1,24 +1,65 @@
+// script_l_1.js
 
+// 1. DOM要素の取得（変更なし）
+// ... (既存のDOM要素の取得)
 
-// 1. DOM要素の取得
-const form = document.getElementById('goal-form');
-const currentWeightInput = document.getElementById('current_weight');
-const targetWeightInput = document.getElementById('target_weight');
-const targetDateInput = document.getElementById('target_date');
-const activityLevelSelect = document.getElementById('activity_level');
-const resultArea = document.getElementById('result-area');
-const messageElement = document.getElementById('goal-message');
-
-// ローカルストレージから最新の体重を取得し、初期値として設定
-function setInitialWeight() {
-    const records = JSON.parse(localStorage.getItem('weightRecords')) || [];
-    if (records.length > 0) {
-        // 最新のレコードを取得
-        const latestWeight = records[records.length - 1].weight;
-        currentWeightInput.value = latestWeight;
+// Vercelのサーバーレス関数からGAS_URLを取得するための変数と処理を追記
+let GAS_URL = '';
+async function getGasUrl() {
+    try {
+        // Vercelのサーバーレス関数(/api/secret)を呼び出す
+        const response = await fetch('/api/secret');
+        if (!response.ok) {
+            throw new Error(`サーバーエラー: ${response.status}`);
+        }
+        const data = await response.json();
+        GAS_URL = data.message;
+    } catch (error) {
+        console.error("GAS_URLの取得に失敗しました:", error);
     }
 }
 
+
+// ローカルストレージから最新の体重を取得し、初期値として設定（既存関数を修正）
+// 💡 GASからの取得ロジックを追加し、GASが優先されるようにします。
+async function setInitialWeight() {
+    await getGasUrl(); // まずGAS_URLを取得
+
+    let latestWeight = null;
+    let records = JSON.parse(localStorage.getItem('weightRecords')) || [];
+
+    // 1. GASから最新の体重データを取得
+    if (GAS_URL) {
+        try {
+            // ⭐ GASに最新体重取得リクエストを送る (GETリクエスト、'getLatest'アクションを想定)
+            const response = await fetch(`${GAS_URL}?action=getLatest`);
+            const gasData = await response.json();
+
+            // GASからのレスポンスに 'latestWeight' が含まれていることを期待
+            if (gasData && gasData.latestWeight) {
+                latestWeight = parseFloat(gasData.latestWeight);
+                console.log("GASから最新体重を取得:", latestWeight);
+            }
+        } catch (error) {
+            console.error("GASからの体重取得に失敗しました:", error);
+        }
+    }
+
+    // 2. GASからのデータがない、または失敗した場合、ローカルストレージの最新データを使用
+    if (latestWeight === null && records.length > 0) {
+        latestWeight = records[records.length - 1].weight;
+        console.log("ローカルストレージから最新体重を取得:", latestWeight);
+    }
+
+    // 3. 初期値を設定
+    if (latestWeight !== null) {
+        currentWeightInput.value = latestWeight.toFixed(1);
+    } else {
+         // データがない場合のデフォルト値（例: 65.0）
+        currentWeightInput.value = '65.0'; 
+        console.log("最新体重のデータが見つからなかったため、初期値を使用");
+    }
+}
 // 2. カロリー計算ロジック
 // 7200kcalは脂肪1kgを燃焼させるのに必要な消費カロリーのおおよその値
 const KCAL_PER_KG = 7200; 
