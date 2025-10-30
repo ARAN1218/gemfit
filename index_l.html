@@ -1,46 +1,45 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ヘルスケア記録アプリ | 体重グラフ</title>
-    
-    <link rel="stylesheet" href="style.css"> 
-    
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GemFit</title>
+    <link rel="stylesheet" href="style_l.css">
+    <div class="background-a">
+    <div class="background-b">
+    <nav class="main-nav">
+  <ul>
+    <li><a href="index_l.html">体重入力（目標）</a></li>
+    <li><a href="index.html">食事記録</a></li>
+    <li><a href="index_r.html">デイリークエスト</a></li>
+  </ul>
+</nav>
+    </div>
+    <div class="background-c">
+      
+   <a href="#" id="showInputButton" class="white-button">今日の体重を入力する </a>
+   <a href="#" class="white-button1">目標の設定 </a>
+
+    </div>
+</div>
 </head>
+
 <body>
-    <div class="background-a">
-        <div class="background-b">
-            
-            <h1>📈 体重の記録と推移</h1>
 
-            <form id="weight-form" class="form-container">
-                <label for="weight">今日の体重 (kg):</label>
-                <input type="number" id="weight" step="0.1" required> 
-                
-                <input type="submit" value="体重を記録する">
-            </form>
-            <p id="message"></p>
-            
-            <hr>
-
-            <div style="text-align: center;">
-                <a href="goal.html" class="white-button1">目標を設定する</a>
-                
-                <a href="index_1.html" class="white-button1">🍽 食事を登録する</a>
-            </div>
-
-            <hr>
-
-            <h2>📊 体重推移グラフ（直近7日）</h2>
-            <div class="result-box" style="padding: 10px; margin-bottom: 20px;">
-                <canvas id="weightChart"></canvas>
-            </div>
-            
-            </div>
+    <div id="weightInputArea" style="display:none; padding: 20px; background-color: #ffffff; border-radius: 10px; margin-top: 20px; width: 300px; margin-left: auto; margin-right: auto;">
+        <h3>今日の体重 (kg)</h3>
+        <input type="number" id="dailyWeight" step="0.1" placeholder="例: 65.5" style="padding: 10px; width: 80%; border: 1px solid #ccc; border-radius: 5px;">
+        <button id="saveWeightButton" style="padding: 10px 15px; margin-top: 10px; background-color: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">記録する</button>
+        <p id="message" style="color: red; margin-top: 10px;"></p>
     </div>
-    
+
+    <div id="weightLogArea" style="margin-top: 20px; padding: 20px; background-color: #fff; border-radius: 10px; width: 300px; margin-left: auto; margin-right: auto;">
+        <h3>過去の体重記録</h3>
+        <ul id="weightList" style="list-style-type: none; padding: 0;">
+            </ul>
+    </div>
     <script src="script_l.js"></script>
 </body>
+
 </html>
