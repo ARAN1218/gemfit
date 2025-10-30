@@ -78,14 +78,15 @@
                             display: true,
                             text: '日付'
                         },
-                        // ⭐⭐ 横軸の文字重なり解消とフォント調整の修正 ⭐⭐
+                        // ⭐⭐ 横軸の文字重なり解消と全日付表示の修正 ⭐⭐
                         ticks: {
                             font: {
                                 size: 10 // フォントサイズを小さく維持
                             },
-                            autoSkip: true, // 重なり防止のために自動スキップを有効にする
+                            autoSkip: false, // ⭐ 全ラベル表示を強制 ⭐
                             maxRotation: 0, 
-                            minRotation: 0 
+                            minRotation: 0,
+                            padding: 5 // ⭐ ラベル間の余白を増やす ⭐
                         }
                     },
                     y: {
@@ -139,7 +140,7 @@
 
                         // YYYY/M/D形式ならD形式に変換 (横軸ラベル用)
                         if (dateKey.includes('/') && dateKey.split('/').length === 3) {
-                            // ⭐⭐ 修正：日付の「日」部分のみを取得し、ラベルとする ⭐⭐
+                            // ⭐ 日付の「日」部分のみを取得し、ラベルとする ⭐
                             dateLabel = dateKey.split('/').pop(); // '2025/10/30' -> '30'
                         }
                         
