@@ -5,44 +5,44 @@ body {
     background-color: #ffa500; /* 全体の背景色はオレンジを維持 */
 }
 
-/* --- 背景要素のスタイル（元のindex.htmlのスタイルに合わせる） --- */
+/* --- 背景要素のスタイル（画面サイズに合わせて変更） --- */
 
 .background-a {
-    height: 620px;
-    padding: 20px;
+    /* height: 620px; <--- 削除: 自動でコンテンツに合わせる */
+    padding: 20px 10px; /* 左右のパディングを少し減らす */
     background-color: #ffa500;
+    min-height: 100vh; /* 画面全体をカバーするために最小高さを設定 */
 }
 
 .background-b {
     color: #fff;
-    height: 25px;
-    width: 330px;
+    /* height: 25px; <--- 削除 */
+    /* width: 330px; <--- 削除: 親要素幅に合わせる */
     font-size: 14px;
     background-color: #ffd700;
-    padding: 20px;
+    padding: 15px 10px; /* パディングを調整 */
     position: relative;
     border-radius: 10px;
     top: 0px;
-    /* 元のCSSに合わせて再調整 */
-    margin-left: -9px; 
+    margin: 0 auto; /* 中央寄せ */
+    max-width: 350px; /* 最大幅を設定 */
 }
 
 .background-c {
     color: #fff;
-    height: 470px;
-    width: 330px;
+    /* height: 470px; <--- 削除: 自動でコンテンツに合わせる */
+    /* width: 330px; <--- 削除: 親要素幅に合わせる */
     font-size: 14px;
     background-color: #ffd700;
     padding: 20px;
     position: relative;
     border-radius: 10px;
     top: 0px;
-    /* 元のCSS（index.htmlのCSS）に合わせる */
-    margin-left: -20px; 
-    margin-top: 45px;
+    margin: 15px auto 0 auto; /* 中央寄せとマージン調整 */
+    max-width: 350px; /* 最大幅を設定 */
 }
 
-/* --- ナビゲーション（元のCSSをそのまま使用） --- */
+/* --- ナビゲーション（元のCSSをそのまま使用、中央寄せは維持） --- */
 .main-nav {
     display: flex;
     justify-content: center;
@@ -76,24 +76,20 @@ body {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    
-    /* 💡 ここを追加・修正: 黒い枠線（太さ1px、実線） */
     border: 1px solid black; 
-    
-    /* background-cのパディングを考慮して調整 */
-    margin: 10px auto 20px auto; /* 左右マージンを auto にして中央寄せ（幅が固定の場合） */
-    width: 90%; /* 幅を親要素の90%に設定（中くらいのサイズに見せるため） */
-    max-width: 300px; /* 最大幅を設定し、あまり大きくならないようにする */
+    margin: 10px auto 20px auto; 
+    width: 90%; 
+    max-width: 300px; /* 最大幅を維持 */
 }
 label {
     display: block;
     margin-bottom: 8px;
     font-weight: bold;
-    color: #333; /* 文字色を黒にする */
-    
+    color: #333; 
 }
 
-input[type="number"] {
+input[type="number"],
+.form-container select { /* selectも追加して幅を揃える */
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
@@ -104,8 +100,8 @@ input[type="number"] {
 
 /* 記録ボタン（submit）のスタイル */
 input[type="submit"] {
-    background-color: orange; /* 👈 指示通りピンクに変更 */
-    color: black; /* 👈 指示通り黒に変更 */
+    background-color: orange; 
+    color: black; 
     padding: 10px 15px;
     border: none;
     border-radius: 4px;
@@ -117,7 +113,6 @@ input[type="submit"] {
 }
 
 input[type="submit"]:hover {
-    /* ホバー時の色をピンクから少し濃い色に変更 */
     background-color: orangered; 
 }
 
@@ -128,7 +123,7 @@ input[type="submit"]:hover {
     color: orange;
 }
 
-/* 目標設定ボタンのスタイル（white-button1）*/
+/* 目標設定ボタンのスタイル（white-button1） - 目標ページには不要かもしれませんが、定義は維持 */
 .white-button1 {
     display: inline-block;
     padding: 15px 24px;
@@ -141,9 +136,9 @@ input[type="submit"]:hover {
     font-weight: bold;
     font-size: 18px;
     transition: background-color 0.3s, color 0.3s;
-    /* 元のCSSに合わせて再調整 */
-    margin-left: 77px; 
-    margin-top: 15px; 
+    margin: 15px auto; /* 中央寄せに変更 */
+    display: block; /* ブロック要素にして中央寄せを有効化 */
+    width: fit-content;
 }
 
 .white-button1:hover {
@@ -156,8 +151,8 @@ input[type="submit"]:hover {
 /* 目標設定ページ専用のスタイル */
 
 /* 入力欄の微調整 */
-.form-container input[type="date"],
-.form-container select {
+.form-container input[type="date"] {
+    /* selectは上で修正済み */
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
@@ -181,7 +176,7 @@ input[type="submit"]:hover {
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    border: 2px solid #333; /* 目立つように枠線を追加 */
+    border: 2px solid #333; 
     margin: 20px auto 10px auto;
     width: 90%; 
     max-width: 300px;
@@ -191,7 +186,7 @@ input[type="submit"]:hover {
 }
 
 .result-box hr {
-    border-color: #ffd700; /* background-cの色に合わせる */
+    border-color: #ffd700; 
     margin: 10px 0;
 }
 
