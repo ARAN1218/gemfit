@@ -3,57 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>食事の記録 | ヘルスケアアプリ</title>
+    <title>ヘルスケア記録アプリ | グラフ</title>
     <link rel="stylesheet" href="style.css"> 
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
 </head>
 <body>
-    <div class="background-a"> 
+    <div class="background-a">
+        <div class="background-b">
+            
+            <h1>📈 体重推移グラフ</h1>
 
-        <a href="index.html" class="back-link">
-            &lt; 体重記録に戻る
-        </a>
-
-        <div class="background-b"> 
-
-            <h1>🍽 食事の記録</h1>
-
+            <div class="result-box" style="padding: 10px; margin-bottom: 20px;">
+                <canvas id="weightChart"></canvas>
+            </div>
+            
             <hr>
 
-            <section id="calorie-search-section">
-                <h3>1. 食事名でカロリーを検索</h3>
-                <div class="form-container" style="max-width: none;"> 
-                    <input type="text" id="food-input" placeholder="例: カレーライス, ラーメン" required>
-                    <button id="search-button">カロリーを検索</button>
-                    
-                    <div id="calorie-result">
-                        <p>ここに検索結果の栄養情報が表示されます。</p>
-                    </div>
-                </div>
-            </section>
-
+            <h2>体重記録ページへ移動</h2>
+            
+            <a href="index_1.html">
+                <button class="white-button1">🍽 食事を登録する</button>
+            </a>
+            
+            <a href="meal-review.html">
+                <button class="white-button1" style="background-color: #f2f2f2;">📅 食事の振り返り</button>
+            </a>
+            
             <hr>
-
-            <section id="meal-record-section">
-                <h3>2. 記録する（検索結果をコピーして確定）</h3>
-                
-                <form id="meal-form" class="form-container" style="max-width: none;">
-                    <label for="meal-date">日付:</label>
-                    <input type="text" id="meal-date" readonly value="">
-                    
-                    <label for="meal-name">食事名:</label>
-                    <input type="text" id="meal-name" placeholder="検索後に値が入ります" required>
-
-                    <label for="recorded-calorie">推定カロリー (kcal):</label>
-                    <input type="number" id="recorded-calorie" placeholder="検索後に値が入ります" required>
-                    
-                    <button type="submit" id="record-meal-button">この食事を記録する</button>
-                </form>
-
-                <p id="meal-message"></p>
-            </section>
+            
+            <h2>過去の記録データ</h2>
+            <div id="history-area" class="result-box">
+                <p>履歴を読み込み中...</p>
+            </div>
+            
         </div>
     </div>
-
-    <script src="script_1.js"></script>
+    
+    <script src="script_l.js"></script>
 </body>
 </html>
