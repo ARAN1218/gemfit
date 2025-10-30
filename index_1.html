@@ -4,58 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>食事の記録 | ヘルスケアアプリ</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
-        h1 { border-bottom: 2px solid #ccc; padding-bottom: 10px; }
-        input[type="text"], input[type="number"], button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
-        .back-link { display: inline-block; margin-bottom: 20px; text-decoration: none; color: #007bff; }
-        #calorie-result { margin-top: 15px; padding: 10px; border: 1px dashed #007bff; }
-    </style>
+    <link rel="stylesheet" href="style.css"> 
 </head>
 <body>
-    
-    <a href="index.html" class="back-link">
-        &lt; 体重記録に戻る
-    </a>
+    <div class="background-a"> 
 
-    <h1>🍽 食事の記録</h1>
+        <a href="index.html" class="back-link">
+            &lt; 体重記録に戻る
+        </a>
 
-    <a href="meal-review.html">
-        <button>食事の振り返り（履歴と削除）</button>
-    </a>
-    
-    <hr>
+        <div class="background-b" style="max-width: 90%; margin: 10px auto;"> 
 
-    <section id="calorie-search-section">
-        <h3>1. 食事名でカロリーを検索</h3>
-        <input type="text" id="food-input" placeholder="例: カレーライス, ラーメン" required>
-        <button id="search-button">カロリーを検索</button>
-        
-        <div id="calorie-result">
-            <p>ここに検索結果の栄養情報が表示されます。</p>
+            <h1>🍽 食事の記録</h1>
+
+            <a href="meal-review.html">
+                <button class="white-button1" style="width: 100%; margin: 0 auto 15px auto;">食事の振り返り（履歴と削除）</button>
+            </a>
+            
+            <hr>
+
+            <section id="calorie-search-section">
+                <h3>1. 食事名でカロリーを検索</h3>
+                <div class="form-container" style="max-width: none;"> 
+                    <input type="text" id="food-input" placeholder="例: カレーライス, ラーメン" required>
+                    <button id="search-button">カロリーを検索</button>
+                    
+                    <div id="calorie-result">
+                        <p>ここに検索結果の栄養情報が表示されます。</p>
+                    </div>
+                </div>
+            </section>
+
+            <hr>
+
+            <section id="meal-record-section">
+                <h3>2. 記録する（検索結果をコピーして確定）</h3>
+                
+                <form id="meal-form" class="form-container" style="max-width: none;">
+                    <label for="meal-date">日付:</label>
+                    <input type="text" id="meal-date" readonly value="">
+                    
+                    <label for="meal-name">食事名:</label>
+                    <input type="text" id="meal-name" placeholder="検索後に値が入ります" required>
+
+                    <label for="recorded-calorie">推定カロリー (kcal):</label>
+                    <input type="number" id="recorded-calorie" placeholder="検索後に値が入ります" required>
+                    
+                    <button type="submit" id="record-meal-button">この食事を記録する</button>
+                </form>
+
+                <p id="meal-message"></p>
+            </section>
         </div>
-    </section>
-
-    <hr>
-
-    <section id="meal-record-section">
-        <h3>2. 記録する（検索結果をコピーして確定）</h3>
-        
-        <form id="meal-form">
-            <label for="meal-date">日付:</label>
-            <input type="text" id="meal-date" readonly value="">
-            
-            <label for="meal-name">食事名:</label>
-            <input type="text" id="meal-name" placeholder="検索後に値が入ります" required>
-
-            <label for="recorded-calorie">推定カロリー (kcal):</label>
-            <input type="number" id="recorded-calorie" placeholder="検索後に値が入ります" required>
-            
-            <button type="submit" id="record-meal-button">この食事を記録する</button>
-        </form>
-
-        <p id="meal-message" style="margin-top: 10px;"></p>
-    </section>
+    </div>
 
     <script src="script_1.js"></script>
 </body>
