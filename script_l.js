@@ -52,11 +52,11 @@
             weightChart.destroy();
         }
 
-        // Chart.jsでグラフを作成 (既存ロジックとほぼ同じ)
+        // Chart.jsでグラフを作成
         weightChart = new Chart(chartCanvas, {
             type: 'line',
             data: {
-                labels: labels, // ⭐ ここに 'M/D'形式のラベルが入る ⭐
+                labels: labels,
                 datasets: [{
                     label: '体重 (kg)',
                     data: data,
@@ -70,14 +70,22 @@
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: true,
+                maintainAspectRatio: false, // ⭐ グラフが縮小するのを防ぐために false に変更 ⭐
                 scales: {
-                    x: { // ⭐ x軸設定の確認 ⭐
-                        // type: 'category' がデフォルトで、labelsを使います
-                        display: true, // 軸の表示を確実にする
+                    x: {
+                        display: true,
                         title: {
                             display: true,
                             text: '日付'
+                        },
+                        // ⭐⭐ 横軸のフォントサイズと回転を調整する修正 ⭐⭐
+                        ticks: {
+                            font: {
+                                size: 10 // フォントサイズを小さくする
+                            },
+                            autoSkip: false, 
+                            maxRotation: 0, 
+                            minRotation: 0 
                         }
                     },
                     y: {
@@ -135,7 +143,7 @@
                         }
                         
                         return {
-                            date: dateLabel,  // グラフの横軸ラベルに使う ⭐
+                            date: dateLabel,  // グラフの横軸ラベルに使う
                             key: dateKey,     // ソートや内部処理に使う
                             weight: item.weight
                         };
