@@ -7,7 +7,7 @@ body {
     background-color: #ffa500; /* 全体の背景色はオレンジを維持 */
 }
 
-/* --- 背景要素のスタイル（画面サイズに合わせて変更、左寄せに戻す） --- */
+/* --- 背景要素のスタイル --- */
 
 .background-a {
     padding: 20px 10px; 
@@ -23,9 +23,10 @@ body {
     position: relative;
     border-radius: 10px;
     top: 0px;
-    /* ⭐ 修正: 左寄せに戻す ⭐ */
-    margin-left: -9px; 
-    max-width: 350px; 
+    /* ⭐ 修正: 中央寄せと最大幅を設定し、黄色い枠のサイズを制御 ⭐ */
+    margin: 10px auto; 
+    width: 95%; /* 画面幅の95%を使う */
+    max-width: 400px; /* ⭐ 最大幅を設定して広がりすぎを防ぐ ⭐ */
 }
 
 .background-c {
@@ -36,13 +37,12 @@ body {
     position: relative;
     border-radius: 10px;
     top: 0px;
-    /* ⭐ 修正: 左寄せに戻す ⭐ */
     margin-left: -20px; 
     margin-top: 45px; 
     max-width: 350px; 
 }
 
-/* --- ナビゲーション（元のCSSをそのまま使用、中央寄せは維持） --- */
+/* --- ナビゲーション --- */
 .main-nav {
     display: flex;
     justify-content: center;
@@ -77,7 +77,6 @@ body {
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     border: 1px solid black; 
-    /* ⭐ 中央寄せは維持 (フォームは黄色い枠の中で中央寄せが一般的) ⭐ */
     margin: 10px auto 20px auto; 
     width: 90%; 
     max-width: 300px; 
@@ -89,9 +88,9 @@ label {
     color: #333; 
 }
 
-/* input[type="text"] も含めないと食事名と検索フォームに効かない */
 input[type="number"],
 input[type="text"],
+input[readonly], /* ⭐ 日付などの読み取り専用フィールドの幅を修正 ⭐ */
 .form-container select { 
     width: 100%;
     padding: 10px;
@@ -101,11 +100,10 @@ input[type="text"],
     box-sizing: border-box;
 }
 
-/* 記録ボタン（submit）と一般ボタンのスタイル */
 input[type="submit"], 
 .form-container button, 
 #record-meal-button,
-#search-button { /* ⭐ 既存のボタンIDにも適用 ⭐ */
+#search-button {
     background-color: orange; 
     color: black; 
     padding: 10px 15px;
@@ -116,7 +114,7 @@ input[type="submit"],
     width: 100%;
     transition: background-color 0.3s;
     font-weight: bold; 
-    margin-top: 5px; /* ボタンが連続する場合の調整 */
+    margin-top: 5px;
 }
 
 input[type="submit"]:hover,
@@ -127,7 +125,7 @@ input[type="submit"]:hover,
 }
 
 /* メッセージ表示エリアのスタイル */
-#message, #meal-message, #review-message { /* ⭐ 食事記録系のIDにも適用 ⭐ */
+#message, #meal-message, #review-message {
     margin-top: 15px;
     font-weight: bold;
     color: orange;
@@ -147,7 +145,6 @@ input[type="submit"]:hover,
     font-weight: bold;
     font-size: 18px;
     transition: background-color 0.3s, color 0.3s;
-    /* ⭐ 中央寄せを維持 ⭐ */
     margin: 15px auto; 
     width: fit-content;
 }
@@ -159,8 +156,6 @@ input[type="submit"]:hover,
 }
 
 /* 目標設定ページ専用のスタイル */
-
-/* 入力欄の微調整 */
 .form-container input[type="date"] {
     width: 100%;
     padding: 10px;
@@ -170,7 +165,6 @@ input[type="submit"]:hover,
     box-sizing: border-box;
 }
 
-/* メッセージの注意書き */
 .note {
     font-size: 12px;
     color: #666;
@@ -179,15 +173,14 @@ input[type="submit"]:hover,
     text-align: right;
 }
 
-/* 結果表示ボックスのスタイル (食事検索結果にも使えそう) */
+/* 結果表示ボックスのスタイル */
 .result-box, 
-#calorie-result div { /* ⭐ #calorie-result の表示ボックスにも適用 ⭐ */
+#calorie-result div { 
     background-color: white;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     border: 2px solid #333; 
-    /* ⭐ 中央寄せを維持 ⭐ */
     margin: 20px auto 10px auto;
     width: 90%; 
     max-width: 300px;
@@ -223,7 +216,7 @@ input[type="submit"]:hover,
     color: #333;
 }
 .delete-btn {
-    padding: 5px 10px !important; /* ボタンのスタイルを上書き */
+    padding: 5px 10px !important;
     background-color: #ff4d4d !important;
     color: white !important;
     font-size: 14px !important;
