@@ -115,12 +115,10 @@
             messageElement.textContent = 'グラフデータを読み込み中...';
             messageElement.style.color = 'gray';
 
-            // ⭐ 修正: mode: 'no-cors' を削除。GAS側でCORSヘッダーを返します ⭐
             const response = await fetch(`${GAS_URL}?action=getHistory`);
             
             if (!response.ok) {
-                 // response.status が 200 以外の場合にエラーをスロー
-                throw new Error(`GAS履歴取得エラー: ${response.status} (CORSは解決しましたが、GASがエラーを返しました)`);
+                throw new Error(`GAS履歴取得エラー: ${response.status} (CORS/GAS設定を確認)`);
             }
             // JSONとしてレスポンスをパース
             const data = await response.json(); 
@@ -136,7 +134,8 @@
                         let dateLabel = '';
                         if (!isNaN(dateObject.getTime())) { 
                             dateKey = `${dateObject.getFullYear()}/${dateObject.getMonth() + 1}/${dateObject.getDate()}`;
-                            dateLabel = String(dateObject.getDate()); // 例: '27'
+                            // グラフのX軸ラベルは日付のみを表示
+                            dateLabel = String(dateObject.getDate()); 
                         } else {
                             dateLabel = '無効';
                             dateKey = '1970/1/1'; 
@@ -196,40 +195,38 @@
             const now = new Date();
             const dateKey = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
 
-            const postData = {
-                type: 'weight',
-                date: dateKey,
-                weight: weightValue.toFixed(1)
-            };
+            // ⭐ 記録データはクエリパラメータとして直接GAS URLに付加する ⭐
+            const recordUrl = `${GAS_URL}?action=recordWeight&date=${dateKey}&weight=${weightValue.toFixed(1)}`;
 
             // ----------------------------------------------------
-            // 💡 GASへのデータ送信処理
+            // 💡 GASへのデータ送信処理 (POSTからGETに変更)
             // ----------------------------------------------------
             if (GAS_URL) {
                 messageElement.textContent = '記録を送信中...';
                 messageElement.style.color = 'blue';
                 
-                // ⭐ POSTリクエストもCORS解決のため mode: 'no-cors' を削除するのが理想ですが、
-                // GASのdoPostは特殊なため、今回は明示的に mode: 'no-cors' を削除します。
-                // GASのdoPostはJSONを返さないため、.then(() => {...}) で対応します。
-                fetch(GAS_URL, {
-                        method: 'POST',
-                        // mode: 'no-cors' は削除
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(postData)
+                // GETリクエストでデータを送信（POSTエラーを回避）
+                fetch(recordUrl)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`GASエラー: ${response.status}`);
+                        }
+                        return response.json();
                     })
-                    .then(() => {
-                        // 成功したら、GASから全データを再取得してグラフを更新する
-                        loadAndRenderChart(); 
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // 成功したら、GASから全データを再取得してグラフを更新する
+                            loadAndRenderChart(); 
 
-                        messageElement.textContent = '✅ 体重を記録しました！グラフを更新します。';
-                        messageElement.style.color = 'orange';
+                            messageElement.textContent = '✅ 体重を記録しました！グラフを更新します。';
+                            messageElement.style.color = 'orange';
+                        } else {
+                            throw new Error(data.message || '記録失敗');
+                        }
                     })
                     .catch(error => {
                         console.error('GAS送信エラー:', error);
-                        messageElement.textContent = '❌ 送信失敗: ネットワークエラーが発生しました。';
+                        messageElement.textContent = `❌ 送信失敗: ${error.message}`;
                         messageElement.style.color = 'red';
                     });
             } else {
