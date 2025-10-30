@@ -1,53 +1,59 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GemFit - 体重入力</title>
-    <link rel="stylesheet" href="style_l.css">
+    <title>食事の記録 | ヘルスケアアプリ</title>
+    <link rel="stylesheet" href="style.css"> 
 </head>
-
 <body>
-    <div class="background-a">
-        <div class="background-b">
-            <nav class="main-nav">
-                <ul>
-                    <li><a href="index_l.html">体重入力（目標）</a></li>
-                    <li><a href="index.html">食事記録</a></li>
-                    <li><a href="index_r.html">デイリークエスト</a></li>
-                </ul>
-            </nav>
-        </div>
-        
-        <div class="background-c">
-            
-            <div class="chart-area" style="width: 90%; margin: 20px auto 10px auto;">
-                <canvas id="weightChart"></canvas>
-            </div>
-            
-            <div class="form-container">
-                <form id="weight-form" action="#">
-                    <label for="weight">体重 (kg)</label>
-                    <input type="number" 
-                           id="weight" 
-                           name="user_weight" 
-                           min="1" 
-                           max="500" 
-                           step="0.1" 
-                           required>
+    <div class="background-a"> 
+
+        <a href="index.html" class="back-link">
+            &lt; 体重記録に戻る
+        </a>
+
+        <div class="background-b"> 
+
+            <h1>🍽 食事の記録</h1>
+
+            <hr>
+
+            <section id="calorie-search-section">
+                <h3>1. 食事名でカロリーを検索</h3>
+                <div class="form-container" style="max-width: none;"> 
+                    <input type="text" id="food-input" placeholder="例: カレーライス, ラーメン" required>
+                    <button id="search-button">カロリーを検索</button>
                     
-                    <input type="submit" value="体重を記録する">
-                </form>
+                    <div id="calorie-result">
+                        <p>ここに検索結果の栄養情報が表示されます。</p>
+                    </div>
+                </div>
+            </section>
+
+            <hr>
+
+            <section id="meal-record-section">
+                <h3>2. 記録する（検索結果をコピーして確定）</h3>
                 
-                <p id="message"></p>
-            </div>
-            
-          <a href="index_l_1.html" class="white-button1">目標の設定</a>
-            
+                <form id="meal-form" class="form-container" style="max-width: none;">
+                    <label for="meal-date">日付:</label>
+                    <input type="text" id="meal-date" readonly value="">
+                    
+                    <label for="meal-name">食事名:</label>
+                    <input type="text" id="meal-name" placeholder="検索後に値が入ります" required>
+
+                    <label for="recorded-calorie">推定カロリー (kcal):</label>
+                    <input type="number" id="recorded-calorie" placeholder="検索後に値が入ります" required>
+                    
+                    <button type="submit" id="record-meal-button">この食事を記録する</button>
+                </form>
+
+                <p id="meal-message"></p>
+            </section>
         </div>
     </div>
-    
-    <script src="script_l.js"></script>
+
+    <script src="script_1.js"></script>
 </body>
 </html>
