@@ -137,7 +137,7 @@
                     .map(item => {
                         let dateKey = String(item.date); // 例: '2025/10/30' または複雑な形式
 
-                        // ⭐⭐ 修正：Dateオブジェクトを介して確実な日付処理を行う ⭐⭐
+                        // Dateオブジェクトを介して確実な日付処理を行う
                         const dateObject = new Date(dateKey);
 
                         let dateLabel = '';
@@ -152,7 +152,6 @@
                             dateLabel = '無効';
                             dateKey = '1970/1/1'; // ソートで先頭に追いやる
                         }
-                        // -----------------------------------------------------
                         
                         return {
                             date: dateLabel,  // グラフの横軸ラベルに使う
@@ -163,7 +162,19 @@
                     // 日付（key）でソート
                     .sort((a, b) => new Date(a.key) - new Date(b.key)); 
 
-                renderChart(formattedRecords);
+                
+                // ⭐⭐ 新規追加：重複排除のロジック（同じ日付キーは最新のものだけを残す） ⭐⭐
+                const uniqueRecords = {};
+                formattedRecords.forEach(record => {
+                    // 同じ日付キーの場合、後から処理したレコード（ソート後の最新）が残る
+                    // これにより、同じ日の複数の記録は最新の1つに集約される
+                    uniqueRecords[record.key] = record;
+                });
+
+                // オブジェクトから配列に戻す (重複排除完了)
+                const cleanRecords = Object.values(uniqueRecords);
+
+                renderChart(cleanRecords); // ⭐ クリーニング後のデータで描画 ⭐
                 messageElement.textContent = ''; // 成功したらメッセージを消す
                 
             } else {
