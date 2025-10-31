@@ -105,3 +105,23 @@ nav ul{
   transition: background-color 0.3s; /* ホバー時の色の変化を滑らかに */
    white-space: nowrap;
 }
+
+/* ===== Responsive overrides (追加) ===== */
+.main-nav ul { flex-wrap: wrap; gap: 6px; }
+.background-b { width: 95%; max-width: 420px; margin: 0 auto; height: auto; }
+.background-c { width: 95%; max-width: 420px; margin: 20px auto 0 auto; height: auto; }
+
+/* 追加: はみ出し防止と狭幅ナビ調整 */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { overflow-x: hidden; }
+@media (max-width: 360px) {
+  /* ナビを横スクロール1行化 */
+  .main-nav { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .main-nav ul { flex-wrap: nowrap; gap: 4px; }
+  .main-nav a { font-size: 12px; padding: 6px 8px; white-space: nowrap; }
+}
+
+@media (min-width: 768px) {
+  .background-b { max-width: 720px; }
+  .background-c { max-width: 720px; }
+}

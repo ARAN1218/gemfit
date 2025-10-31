@@ -378,6 +378,50 @@ nav ul{
 
 }
 
+/* ===== 追加: はみ出し防止と基礎レスポンシブ ===== */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { overflow-x: hidden; }
+.main-nav ul { flex-wrap: wrap; gap: 6px; }
+
+@media (max-width: 360px) {
+  /* ナビを横スクロール1行化 */
+  .main-nav { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .main-nav ul { flex-wrap: nowrap; gap: 4px; }
+  .main-nav a { font-size: 12px; padding: 6px 8px; white-space: nowrap; }
+}
+/* ===== Responsive overrides (追加) ===== */
+.main-nav ul { flex-wrap: wrap; gap: 6px; }
+.background-b {
+  width: 95%;
+  max-width: 420px;
+  margin: 0 auto;
+  height: auto;
+}
+.background-c {
+  width: 95%;
+  max-width: 420px;
+  margin: 20px auto 0 auto;
+  height: auto;
+}
+.white-box,
+.white-box1,
+.white-button,
+.white-button1,
+.white-button2 {
+  margin-left: auto !important;
+  margin-right: auto !important;
+  width: 90%;
+  max-width: 360px;
+}
+.nokori1 { margin-left: 20px; }
+.nokori2 { margin-left: 20px; }
+
+@media (min-width: 768px) {
+  .background-b { max-width: 640px; }
+  .background-c { max-width: 640px; }
+  .white-box, .white-box1, .white-button, .white-button1, .white-button2 { max-width: 520px; }
+}
+
 
 
 .white-button1 {

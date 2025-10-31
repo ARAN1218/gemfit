@@ -117,3 +117,25 @@ input[type="submit"]:hover, .form-container button:hover,
     padding: 5px 10px !important; background-color: #ff4d4d !important;
     color: white !important; font-size: 14px !important; width: auto !important;
 }
+
+/* ===== Responsive overrides (追加) ===== */
+.main-nav ul { flex-wrap: wrap; gap: 6px; }
+.background-b, .background-c { width: 95%; max-width: 420px; margin: 10px auto 0 auto; height: auto; }
+.form-container, #calorie-result div { width: 95%; max-width: 420px; margin-left: auto; margin-right: auto; }
+.meal-item { max-width: 420px; }
+#meal-message, #review-message { text-align: center; }
+
+/* 追加: はみ出し防止と狭幅ナビ調整 */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { overflow-x: hidden; }
+@media (max-width: 360px) {
+  /* ナビを横スクロール1行化 */
+  .main-nav { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .main-nav ul { flex-wrap: nowrap; gap: 4px; }
+  .main-nav a { font-size: 12px; padding: 6px 8px; white-space: nowrap; }
+}
+
+@media (min-width: 768px) {
+  .background-b, .background-c { max-width: 720px; }
+  .form-container, #calorie-result div, .meal-item { max-width: 560px; }
+}
