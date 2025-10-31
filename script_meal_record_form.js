@@ -1,26 +1,12 @@
-// script_1.js
-// 食事記録ページ (index_1.html) 用のスクリプト
+// script_meal_record_form.js
+// 食事記録ページ (meal_record_form.html) 用のスクリプト
 
 (async () => {
-    let GAS_URL = '';
-    
-    // ===============================================
-    // 1. GAS URLの初期取得 (Vercel API経由)
-    // ===============================================
-    try {
-        const response = await fetch('/api/secret');
-        if (!response.ok) {
-            throw new Error(`サーバーエラー: ${response.status}`);
-        }
-        const data = await response.json();
-        GAS_URL = data.message;
-    } catch (error) {
-        console.error("GAS_URLの取得に失敗しました:", error);
-        return;
-    }
+    // APIエンドポイント
+    const API_ENDPOINT = '/api/sheet'; 
 
     // ===============================================
-    // 2. DOM要素の取得
+    // DOM要素の取得
     // ===============================================
     const foodInput = document.getElementById('food-input');
     const searchButton = document.getElementById('search-button');
@@ -33,46 +19,97 @@
     const recordMealButton = document.getElementById('record-meal-button');
     const mealMessageElement = document.getElementById('meal-message');
 
-    // 初期日付の設定
+    // ★ 追加: 履歴表示用のコンテナ
+    const historyContainer = document.getElementById('meal-history-container');
+
+    // 日付の初期設定
     const today = new Date();
     const dateKey = `${today.getFullYear()}/${today.getMonth() + 1}/${today.getDate()}`;
     mealDateInput.value = dateKey;
 
     // ===============================================
-    // 3. カロリー検索のイベント処理 (Gemini API利用)
+    // ★ 新機能: 食事履歴の読み込みと描画
+    // ===============================================
+    async function loadAndRenderMealHistory() {
+        if (!historyContainer) return;
+
+        try {
+            // /api/sheet に ?type=meal をつけてGETリクエスト
+            const response = await fetch(`${API_ENDPOINT}?type=meal`);
+            if (!response.ok) {
+                throw new Error(`APIエラー: ${response.status}`);
+            }
+            
+            const data = await response.json();
+
+            if (data.status === 'success' && data.data && data.data.length > 0) {
+                // データを逆順にして最新5件を取得
+                const recentMeals = data.data.reverse().slice(0, 5);
+                
+                // テーブルHTMLを構築
+                let tableHTML = '<table class="history-table">';
+                tableHTML += '<thead><tr><th>日付</th><th>食事名</th><th>カロリー</th></tr></thead>';
+                tableHTML += '<tbody>';
+                
+                for (const meal of recentMeals) {
+                    tableHTML += `
+                        <tr>
+                            <td>${escapeHTML(meal.date)}</td>
+                            <td>${escapeHTML(meal.mealName)}</td>
+                            <td>${escapeHTML(meal.calorie)} kcal</td>
+                        </tr>
+                    `;
+                }
+                
+                tableHTML += '</tbody></table>';
+                historyContainer.innerHTML = tableHTML;
+                
+            } else {
+                historyContainer.innerHTML = '<p style="color: gray;">記録はまだありません。</p>';
+            }
+
+        } catch (error) {
+            console.error('食事履歴の読み込みエラー:', error);
+            historyContainer.innerHTML = '<p style="color: red;">❌ 履歴の読み込みに失敗しました。</p>';
+        }
+    }
+
+    // HTMLエスケープ用ヘルパー関数
+    function escapeHTML(str) {
+        if (str == null) return ''; // nullやundefinedを空文字に
+        return String(str).replace(/[&<>"']/g, function(match) {
+            return {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[match];
+        });
+    }
+
+    // ===============================================
+    // 3. カロリー検索のイベント処理 (変更なし)
     // ===============================================
     if (searchButton) {
         searchButton.addEventListener('click', async () => {
             const foodName = foodInput.value.trim();
-            if (!foodName) {
-                calorieResultDiv.innerHTML = '<p style="color:red;">食事名を入力してください。</p>';
-                return;
-            }
-
+            if (!foodName) { /* (中略) */ return; }
             searchButton.disabled = true;
             calorieResultDiv.innerHTML = `<p style="color:blue;">「${foodName}」の情報を検索中...</p>`;
-            
-            // フォームの値をリセット
             recordedCalorieInput.value = '';
             mealNameInput.value = '';
 
             try {
-                // VercelのAPI Routeを呼び出し
                 const response = await fetch('/api/search-calorie', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ foodName })
                 });
-
                 const data = await response.json();
-
                 if (response.ok && data.status === 'success') {
                     const result = data.data;
                     const calories = parseFloat(result.calories);
-                    
-                    // 検索結果の表示
                     calorieResultDiv.innerHTML = `
                         <div style="padding: 10px; background-color: #e6f7ff; border: 1px solid #007bff;">
                             <h4>✅ ${foodName} の推定栄養情報</h4>
@@ -82,8 +119,6 @@
                             </ul>
                         </div>
                     `;
-                    
-                    // ⭐ 検索結果を記録フォームに自動入力 ⭐
                     if (!isNaN(calories) && calories > 0) {
                         recordedCalorieInput.value = calories.toFixed(0);
                         mealNameInput.value = foodName;
@@ -93,7 +128,6 @@
                         mealMessageElement.textContent = '❌ 有効なカロリー値が取得できませんでした。手動で入力してください。';
                         mealMessageElement.style.color = 'red';
                     }
-
                 } else {
                     const message = data.error || '不明なエラーが発生しました。';
                     calorieResultDiv.innerHTML = `<p style="color:red;">❌ 検索失敗: ${message}</p>`;
@@ -108,59 +142,59 @@
     }
 
     // ===============================================
-    // 4. 食事記録のイベント処理 (GASへのPOST)
+    // 4. 食事記録のイベント処理 (変更なし)
     // ===============================================
     if (mealForm) {
         mealForm.addEventListener('submit', async (event) => {
             event.preventDefault();
-
             const recordedCalorie = recordedCalorieInput.value;
             const mealName = mealNameInput.value.trim();
-            
             if (!recordedCalorie || isNaN(parseFloat(recordedCalorie)) || !mealName) {
                 mealMessageElement.textContent = '❌ カロリーと食事名が正しく入力されていません。';
-                mealMessageElement.style.color = 'red';
                 return;
             }
-
-            // データの準備
             const postData = {
                 type: 'meal', 
                 date: mealDateInput.value,
                 calorie: parseFloat(recordedCalorie),
                 mealName: mealName
             };
-
             recordMealButton.disabled = true;
             mealMessageElement.textContent = '記録を送信中...';
-            mealMessageElement.style.color = 'blue';
 
             try {
-                const response = await fetch(GAS_URL, {
+                const response = await fetch(API_ENDPOINT, { // /api/sheet への POST
                     method: 'POST',
-                    mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(postData)
                 });
+                const data = await response.json();
+                if (response.ok && data.status === 'success') {
+                    mealMessageElement.textContent = `✅ 「${mealName}」 (${recordedCalorie} kcal) を記録しました！`;
+                    mealMessageElement.style.color = 'green';
+                    foodInput.value = '';
+                    recordedCalorieInput.value = '';
+                    mealNameInput.value = '';
+                    
+                    // ★ 追加: 記録成功したら、履歴テーブルも再読み込みする
+                    await loadAndRenderMealHistory(); 
 
-                mealMessageElement.textContent = `✅ 「${mealName}」 (${recordedCalorie} kcal) を記録しました！`;
-                mealMessageElement.style.color = 'green';
-                
-                // フォームをリセット
-                foodInput.value = '';
-                recordedCalorieInput.value = '';
-                mealNameInput.value = '';
-
+                } else {
+                    throw new Error(data.message || '記録に失敗しました');
+                }
             } catch (error) {
-                console.error('GAS送信エラー:', error);
-                mealMessageElement.textContent = '❌ 送信失敗: ネットワークエラーが発生しました。';
+                console.error('API送信エラー:', error);
+                mealMessageElement.textContent = `❌ 送信失敗: ${error.message}`;
                 mealMessageElement.style.color = 'red';
             } finally {
                 recordMealButton.disabled = false;
             }
         });
     }
+
+    // ===============================================
+    // ★ 実行: ページ読み込み時に履歴を取得
+    // ===============================================
+    await loadAndRenderMealHistory();
 
 })();

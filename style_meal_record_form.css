@@ -139,3 +139,38 @@ html, body { overflow-x: hidden; }
   .background-b, .background-c { max-width: 720px; }
   .form-container, #calorie-result div, .meal-item { max-width: 560px; }
 }
+
+/* style_meal_record_form.css に追記 */
+
+#meal-history-section {
+    margin-bottom: 20px;
+}
+/* style_meal_record_form.css に追記・修正 */
+
+#meal-history-section {
+    margin-bottom: 20px;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9em;
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+
+.history-table th,
+.history-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+    color: #333; /* ★ 修正点: この行を追加して文字色を黒（濃いグレー）に指定 */
+}
+
+.history-table th {
+    background-color: #f2f2f2;
+}
+
+.history-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
