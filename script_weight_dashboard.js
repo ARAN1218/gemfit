@@ -1,20 +1,8 @@
 // script_l.js
 
 (async () => {
-    // Vercelのサーバーレス関数(/api/secret)を呼び出す
-    let GAS_URL = '';
-    try {
-        const response = await fetch('/api/secret');
-        if (!response.ok) {
-            throw new Error(`サーバーエラー: ${response.status}`);
-        }
-        const data = await response.json();
-        GAS_URL = data.message; 
-    } catch (error) {
-        console.error("GAS_URLの取得に失敗しました:", error);
-        document.getElementById('message').textContent = '❌ サーバー連携エラー。F12でコンソールを確認してください。';
-        return; 
-    }
+    // クライアントからはVercelのプロキシ(API)にアクセスしてCORSを回避
+    const API_BASE = '/api/gas';
 
 
     // 1. DOM要素の取得
@@ -63,17 +51,21 @@
      * GASから体重履歴を取得し、renderChartを呼び出す
      */
     async function loadAndRenderChart() {
-        if (!GAS_URL) { return; }
 
         try {
             messageElement.textContent = 'グラフデータを読み込み中...';
             messageElement.style.color = 'gray';
 
-            // GETリクエストで履歴を取得
-            const response = await fetch(`${GAS_URL}?action=getHistory`);
+            // GETリクエストで履歴を取得（サーバープロキシ経由）
+            const response = await fetch(`${API_BASE}?action=getHistory`);
             
             if (!response.ok) { throw new Error(`GAS履歴取得エラー: ${response.status}`); }
             
+            const contentType = response.headers.get('content-type') || '';
+            if (!contentType.includes('application/json')) {
+                const text = await response.text();
+                throw new Error(`Unexpected response (non-JSON): ${text.slice(0, 120)}...`);
+            }
             const data = await response.json(); 
 
             if (data.status === 'success' && data.data) {
@@ -131,15 +123,20 @@
             const dateKey = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
 
             // ⭐ GETリクエストで記録データ送信 ⭐
-            const recordUrl = `${GAS_URL}?action=recordWeight&date=${dateKey}&weight=${weightValue.toFixed(1)}`;
+            const recordUrl = `${API_BASE}?action=recordWeight&date=${dateKey}&weight=${weightValue.toFixed(1)}`;
 
-            if (GAS_URL) {
+            if (true) {
                 messageElement.textContent = '記録を送信中...';
                 messageElement.style.color = 'blue';
                 
                 fetch(recordUrl)
-                    .then(response => {
+                    .then(async (response) => {
                         if (!response.ok) { throw new Error(`GASエラー: ${response.status}`); }
+                        const ct = response.headers.get('content-type') || '';
+                        if (!ct.includes('application/json')) {
+                            const t = await response.text();
+                            throw new Error(`Unexpected response (non-JSON): ${t.slice(0, 120)}...`);
+                        }
                         return response.json();
                     })
                     .then(data => {
