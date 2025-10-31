@@ -1,20 +1,8 @@
 // script_l.js
 
 (async () => {
-    // Vercelのサーバーレス関数(/api/secret)を呼び出す
-    let GAS_URL = '';
-    try {
-        const response = await fetch('/api/secret');
-        if (!response.ok) {
-            throw new Error(`サーバーエラー: ${response.status}`);
-        }
-        const data = await response.json();
-        GAS_URL = data.message; 
-    } catch (error) {
-        console.error("GAS_URLの取得に失敗しました:", error);
-        document.getElementById('message').textContent = '❌ サーバー連携エラー。F12でコンソールを確認してください。';
-        return; 
-    }
+    // 新APIエンドポイント（サーバーレス関数経由）
+    const API_ENDPOINT = '/api/sheet';
 
 
     // 1. DOM要素の取得
@@ -68,41 +56,16 @@
             messageElement.textContent = 'グラフデータを読み込み中...';
             messageElement.style.color = 'gray';
 
-            // GETリクエストで履歴を取得（GASへ直接）
-            const response = await fetch(`${GAS_URL}?action=getHistory`);
+            // GETリクエストで履歴を取得（サーバー経由）
+            const response = await fetch(`${API_ENDPOINT}`);
             
             if (!response.ok) { throw new Error(`GAS履歴取得エラー: ${response.status}`); }
             
-            const contentType = response.headers.get('content-type') || '';
-            if (!contentType.includes('application/json')) {
-                const text = await response.text();
-                throw new Error(`Unexpected response (non-JSON): ${text.slice(0, 120)}...`);
-            }
-            const data = await response.json(); 
+            const data = await response.json();
 
             if (data.status === 'success' && data.data) {
-                // ... データ処理と重複排除ロジック ...
-                const formattedRecords = data.data
-                    .map(item => {
-                        let dateKey = String(item.date); 
-                        const dateObject = new Date(dateKey);
-                        let dateLabel = !isNaN(dateObject.getTime()) ? String(dateObject.getDate()) : '無効';
-                        if (!isNaN(dateObject.getTime())) { 
-                            dateKey = `${dateObject.getFullYear()}/${dateObject.getMonth() + 1}/${dateObject.getDate()}`;
-                        } else {
-                            dateKey = '1970/1/1'; 
-                        }
-                        return { date: dateLabel, key: dateKey, weight: item.weight };
-                    })
-                    .sort((a, b) => new Date(a.key) - new Date(b.key)); 
-
-                const uniqueRecords = {};
-                formattedRecords.forEach(record => { uniqueRecords[record.key] = record; });
-                const cleanRecords = Object.values(uniqueRecords);
-
-                renderChart(cleanRecords); 
-                messageElement.textContent = ''; 
-                
+                renderChart(data.data);
+                messageElement.textContent = '';
             } else {
                 renderChart([]);
                 messageElement.textContent = 'データがありません。体重を入力してください。';
@@ -135,29 +98,27 @@
             const dateKey = `${now.getFullYear()}/${now.getMonth() + 1}/${now.getDate()}`;
 
             // ⭐ GETリクエストで記録データ送信 ⭐
-            const recordUrl = `${GAS_URL}?action=recordWeight&date=${dateKey}&weight=${weightValue.toFixed(1)}`;
+            // POSTでサーバーへ送信
+            const recordUrl = `${API_ENDPOINT}`;
 
-            if (GAS_URL) {
+            if (true) {
                 messageElement.textContent = '記録を送信中...';
                 messageElement.style.color = 'blue';
                 
-                fetch(recordUrl)
-                    .then(async (response) => {
-                        if (!response.ok) { throw new Error(`GASエラー: ${response.status}`); }
-                        const ct = response.headers.get('content-type') || '';
-                        if (!ct.includes('application/json')) {
-                            const t = await response.text();
-                            throw new Error(`Unexpected response (non-JSON): ${t.slice(0, 120)}...`);
-                        }
-                        return response.json();
+                fetch(recordUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ date: dateKey, weight: weightValue.toFixed(1) })
                     })
+                    .then(response => response.json().then(data => ({ ok: response.ok, data })))
                     .then(data => {
-                        if (data.status === 'success') {
+                        if (data.ok && data.data && data.data.status === 'success' || data.data?.status === 'success') {
                             loadAndRenderChart(); 
                             messageElement.textContent = '✅ 体重を記録しました！グラフを更新します。';
                             messageElement.style.color = 'orange';
                         } else {
-                            throw new Error(data.message || '記録失敗');
+                            const d = data.data || {};
+                            throw new Error(d.message || '記録失敗');
                         }
                     })
                     .catch(error => {
